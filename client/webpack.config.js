@@ -13,9 +13,10 @@ module.exports = {
   devServer: {
     port: '5000',
     historyApiFallback: true,
+    allowedHosts: "all",
     static: {
       directory: path.join(__dirname, 'public')
-},
+    },
     open: true,
     hot: true,
     liveReload: true,
