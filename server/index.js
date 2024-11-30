@@ -13,8 +13,20 @@ app.use(express.urlencoded({ extended: true })); // url-encoded bodies
 app.use(cors()); // CORS because we're on different port :(
 
 app.post('/sign-in', cors(), (request, response, next) => {
-  const auth = atob(request.headers.authorization.split(' ')[1]).split(':');
+
+  let auth = request.header('Authorization');
+
+  if (!auth) {
+    return response.status(401).json({message: "Unauthorized"});
+  }
+
+  if (!auth.includes(" ")) {
+    return response.status(400).json({message: "Bad Request"});
+  }
+
+  auth = atob(auth.split(' ')[1]).split(':');
   console.log(auth);
+  console.log(request.body);
   response.json({
     success: auth[1] === '123456'
   });
