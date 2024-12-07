@@ -1,78 +1,23 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ObjectId } = require("mongodb");
+const account = require('./account');
+const product = require('./product');
 
-const uri = "mongodb://localhost:27017/";
-const client = new MongoClient(uri, {
-  family: 4 // Node 17+ requirement
-});
 var app = express();
-
 app.use(express.json()); // body parser
 app.use(express.urlencoded({ extended: true })); // url-encoded bodies
 app.use(cors()); // CORS because we're on different port :(
 
-app.post('/sign-in', cors(), (request, response, next) => {
+const routes = [
+  {endpoint: '/account', path: './account/index.js', handler: account},
+  {endpoint: '/product', path: './product/index.js', handler: product}
+];
 
-  let auth = request.header('Authorization');
-
-  if (!auth) {
-    return response.status(401).json({message: "Unauthorized"});
-  }
-
-  if (!auth.includes(" ")) {
-    return response.status(400).json({message: "Bad Request"});
-  }
-
-  auth = atob(auth.split(' ')[1]).split(':');
-  console.log(auth);
-  console.log(request.body);
-  response.json({
-    success: auth[1] === '123456'
-  });
+routes.forEach((element) => {
+  app.use(element.endpoint, element.handler);
 });
 
-// GET /products
-app.get('/products', cors(), async (request, response, next) => {
-    const database = client.db('matchsquare');
-    const products = database.collection('products');
-    response.json(await products.find().toArray());
-});
-
-// POST /products
-app.post('/products', cors(), async (request, response, next) => {
-  console.log(request.body);
-  const database = client.db('matchsquare');
-  const products = database.collection('products');
-
-  response.json(await products.insertOne(request.body));
-});
-
-// PATCH /products
-app.patch('/products', cors(), async (request, response, next) => {
-  console.log(request.body);
-  const database = client.db('matchsquare');
-  const products = database.collection('products');
-
-  response.json(await products.updateOne(
-      {_id: new ObjectId(request.body._id)},
-      { $set: { name: request.body.name, cost: request.body.cost}},
-      {}
-    ));
-  });
-
-// DELETE /products
-app.delete('/products', cors(), async (request, response, next) => {
-  const database = client.db('matchsquare');
-  const products = database.collection('products');
-  response.json(
-    await products.deleteMany({
-      _id: {
-        $in: request.body.map(id => (new ObjectId(id)))
-      }
-    })
-  );
-});
+console.table(routes);
 
 // The Backend SERVER
 app.listen(8080, () => {
