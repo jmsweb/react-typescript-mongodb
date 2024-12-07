@@ -13,7 +13,7 @@ const Login: React.FC = () => {
 
     const onSubmit = async (e: SyntheticEvent) => {
         e.preventDefault();
-        let response = await fetch('http://localhost:8080/sign-in', {
+        let response = await fetch('http://raspberrypi.local:8080/account/sign-in', {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',
