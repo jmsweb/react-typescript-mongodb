@@ -29,6 +29,10 @@ router.post('/', cors(), async (request, response, next) => {
   const database = client.db('matchsquare');
   const products = database.collection('products');
 
+  if (request.body.name == null || request.body.cost == null) {
+    return response.status(400).json({message: "Bad Request"});
+  }
+
   response.json(await products.insertOne(request.body));
 });
 

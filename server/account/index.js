@@ -31,7 +31,12 @@ router.post('/sign-in', cors(), (request, response, next) => {
   auth = atob(auth.split(' ')[1]).split(':');
   console.log(auth);
   console.log(request.body);
-  response.json({ success: auth[1] === '123456' });
+
+  if (auth[1] !== '123456') {
+    return response.status(401).json({message: "Unauthorized"});
+  }
+
+  response.status(200).json({ success: auth[1] === '123456' });
 });
 
 module.exports = router;
