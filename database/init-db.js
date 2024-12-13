@@ -9,6 +9,7 @@ async function run() {
   try {
     const database = client.db('matchsquare');
     const products = database.collection('products');
+    await products.drop();
     const query = [
       { name: 'A product', cost: 2.99 },
       { name: 'B product', cost: 3.99 },
